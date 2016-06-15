@@ -17,9 +17,17 @@ start_link() ->
    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 init(_Args) ->
+   ok = add_metric(application:get_env(telemetry, collectors, [])),
+
    self() ! collect,
    self() ! flush,
+
    {ok, #{incoming => []}}.
+
+add_metric([]) -> ok;
+add_metric([{Metric, {Type, Opts}, _Call} | Rest]) ->
+   ok = exometer:new(Metric, Type, Opts),
+   add_metric(Rest).
 
 handle_call(Ev = {event, _Service, _Value, _Attrs, _Millis}, _From, #{incoming := Incoming} = State) ->
    {ok, NewState} = send_events([Ev | Incoming], State#{incoming => []}),
@@ -62,20 +70,20 @@ handle_info(flush, State) ->
 handle_info(collect, State) ->
    Interval = application:get_env(telemetry, sample_interval, 1000),
 
-   _ = collect(application:get_env(telemetry, callbacks, [])),
+   _ = collect(application:get_env(telemetry, collectors, [])),
 
    erlang:send_after(Interval, self(), collect),
    {noreply, State}.
 
 collect([]) -> ok;
 
-collect([{[erlang, stats, io, bytes] = Metric, {{Mod, Fun, _Arity}, Args}} | T]) ->
+collect([{[erlang, stats, io, bytes] = Metric, _Type, {{Mod, Fun, _Arity}, Args}} | T]) ->
    {{input, In}, {output, Out}} = apply(Mod, Fun, Args),
    exometer:update(Metric ++ [in], In),
    exometer:update(Metric ++ [out], Out),
    collect(T);
 
-collect([{Metric, {{Mod, Fun, _Arity}, Args}} | T]) ->
+collect([{Metric, _Type, {{Mod, Fun, _Arity}, Args}} | T]) ->
    exometer:update(Metric, fmt(Metric, apply(Mod, Fun, Args))),
    collect(T).
 
