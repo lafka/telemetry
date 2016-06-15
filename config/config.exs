@@ -1,7 +1,6 @@
 use Mix.Config
 
-{:ok, addr} = :inet.parse_address 'fddd:a8d4:4e54::2b8d:fe8'
-config :katja, :host, addr
+config :katja, :host, {127, 0, 0, 1}
 config :katja, :transport, :tcp
 config :katja, :port, 5555
 config :katja, :defaults, []

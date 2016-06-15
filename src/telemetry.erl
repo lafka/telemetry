@@ -29,7 +29,7 @@ emit(Metric, Value, Attrs) ->
 
 unique(L) ->
     unique([],L).
-unique(R,[]) -> R; 
+unique(R,[]) -> R;
 unique(R,[H|T]) ->
     case member_remove(H,T,[],true) of
         {false,Nt} -> unique(R,Nt);
