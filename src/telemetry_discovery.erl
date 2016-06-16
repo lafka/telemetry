@@ -12,6 +12,13 @@ connect(#{fqdn := FQDN}) ->
       {ok, Addr} ->
          application:set_env(katja, transport, tcp),
          application:set_env(katja, host, Addr),
+         Defaults = application:get_env(katja, defaults, []),
+         NewDefaults = case lists:keyreplace(host, 1, Defaults, {host, hostname()}) of
+            Defaults -> [{host, hostname()} | Defaults];
+            Replaced -> Replaced
+         end,
+
+         application:set_env(katja, defaults, NewDefaults),
 
          case whereis(katja_writer) of
             Pid when is_pid(Pid) ->
@@ -25,6 +32,10 @@ connect(#{fqdn := FQDN}) ->
       {error, nxdomain} = Err ->
          Err
    end.
+
+hostname() ->
+   [_Service | Host] = binary:split(atom_to_binary(node(), utf8), <<"@">>),
+   Host.
 
 get_addr(FQDN, AFs) when is_binary(FQDN) -> get_addr(binary_to_list(FQDN), AFs);
 get_addr(_FQDN, []) -> {error, nxdomain};
