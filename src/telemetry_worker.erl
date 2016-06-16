@@ -44,7 +44,7 @@ send_events([Ev | Events], #{incoming := _Rest} = State) ->
                               Service),
 
    case katja:send_event([{service, ServiceFmt},
-                          {time, Millis},
+                          {time, trunc(Millis / 1000)},
                           {tags, maps:get(tags, Attrs, [])},
                           {state, maps:get(state, Attrs, "ok")},
                           {attributes, maps:to_list(maps:without([state, tags], Attrs))},
