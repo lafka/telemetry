@@ -19,15 +19,7 @@ connect(#{fqdn := FQDN}) ->
          end,
 
          application:set_env(katja, defaults, NewDefaults),
-
-         case whereis(katja_writer) of
-            Pid when is_pid(Pid) ->
-               katja_writer:stop(Pid),
-               katja_reader:stop(Pid);
-
-            _ ->
-               ok
-         end;
+         ok;
 
       {error, nxdomain} = Err ->
          Err
