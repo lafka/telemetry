@@ -11,7 +11,16 @@ connect(#{fqdn := FQDN}) ->
    case get_addr(FQDN, [inet6, inet]) of
       {ok, Addr} ->
          application:set_env(katja, transport, tcp),
-         application:set_env(katja, host, Addr);
+         application:set_env(katja, host, Addr),
+
+         case whereis(katja_writer) of
+            Pid when is_pid(Pid) ->
+               katja_writer:stop(Pid),
+               katja_reader:stop(Pid);
+
+            _ ->
+               ok
+         end;
 
       {error, nxdomain} = Err ->
          Err
