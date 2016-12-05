@@ -12,6 +12,7 @@ connect(#{fqdn := FQDN}) ->
       {ok, Addr} ->
          application:set_env(katja, transport, tcp),
          application:set_env(katja, host, Addr),
+
          Defaults = application:get_env(katja, defaults, []),
          NewDefaults = case lists:keyreplace(host, 1, Defaults, {host, hostname()}) of
             Defaults -> [{host, hostname()} | Defaults];

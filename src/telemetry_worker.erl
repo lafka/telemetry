@@ -43,12 +43,26 @@ send_events([Ev | Events], #{incoming := _Rest} = State) ->
                                  (List) when is_list(List) -> [" ", List] end,
                               Service),
 
-   case katja:send_event([{service, ServiceFmt},
-                          {time, trunc(Millis / 1000)},
-                          {tags, maps:get(tags, Attrs, [])},
-                          {state, maps:get(state, Attrs, "ok")},
-                          {attributes, maps:to_list(maps:without([state, tags], Attrs))},
-                          {metric, Value}]) of
+   % ensure format is up to spec!
+   EncAttrs = lists:map(fun
+      ({K, V}) when is_integer(V) -> {[K], integer_to_list(V)};
+      ({K, V}) when is_binary(V)  -> {[K], binary_to_list(V)};
+      ({K, V}) when is_list(V)  -> {[K], V}
+      end, maps:to_list(maps:without([state, tags], Attrs))),
+
+   EncTags = lists:map(fun
+      (Tag) when is_binary(Tag) -> [Tag];
+      (Tag) when is_list(Tag) -> Tag
+      end, maps:get(tags, Attrs, [])),
+
+   KatjaEv = [{service, ServiceFmt},
+              {time, trunc(Millis / 1000)},
+              {tags, EncTags},
+              {state, [maps:get(state, Attrs, "ok")]},
+              {attributes, EncAttrs},
+              {metric, Value}],
+
+   case katja:send_event(KatjaEv) of
       ok -> send_events(Events, State);
       Err ->
          error_logger:error_msg("failed to save metrics: ~p~nreason: ~p~n", [Ev, Err]),
