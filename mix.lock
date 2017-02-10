@@ -10,7 +10,7 @@
   "jiffy": {:git, "git://github.com/davisp/jiffy.git", "137d3d94b6ee10001d761d412cbbe7f665680c98", [ref: "0.13.3"]},
   "katja": {:git, "https://github.com/nifoc/katja.git", "5c66df7aeec5e7755dca23fd05461e651ee1673f", [tag: "v0.9.1"]},
   "lager": {:git, "git://github.com/basho/lager.git", "b6b6cebcb27ccff8acc59ae775acebc2f52e4926", [tag: "2.0.3"]},
-  "meck": {:git, "git://github.com/eproxus/meck.git", "dde759050eff19a1a80fd854d7375174b191665d", [tag: "0.8.2"]},
+  "meck": {:git, "https://github.com/eproxus/meck.git", "dde759050eff19a1a80fd854d7375174b191665d", [tag: "0.8.2"]},
   "netlink": {:git, "git://github.com/Feuerlabs/netlink.git", "e6d208c2d9ad0c16843584006812b9fc99b65d0a", [tag: "1.0"]},
   "parse_trans": {:git, "git://github.com/uwiger/parse_trans.git", "82cc00264aa1bad8fc5c0739b7541feb4a843432", [tag: "2.9"]},
   "protobuffs": {:git, "git://github.com/basho/erlang_protobuffs", "a1eeee77aef639a33cc5a2dd7abed7e4f4b83f9b", [tag: "0.8.2"]},
